@@ -1,0 +1,5 @@
+---
+
+- name: install the openjdk (java development kit) package
+  sudo: true
+  apt: name=openjdk-7-jdk state=present

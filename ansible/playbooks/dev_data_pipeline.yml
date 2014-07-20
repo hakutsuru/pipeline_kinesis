@@ -1,0 +1,5 @@
+---
+
+- hosts: development
+  roles:
+    - { role: clojure, tags: clojure }

@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# how much ram the virtual machine should have;
+# export $PIPELINE_MEMORY to override the default
+PIPELINE_MEMORY = ENV['PIPELINE_MEMORY'] ||= '2048'
+
+# Vagrantfile API/syntax version.
+VAGRANTFILE_API_VERSION = '2'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.define :pipeline do |pipeline|
+    pipeline.vm.box = 'trusty'
+    pipeline.vm.box_url = 'http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box'
+    pipeline.vm.hostname = 'pipeline.bigfuncorp.com'
+    pipeline.vm.network :private_network, ip: '192.168.111.88'
+    pipeline.ssh.forward_agent = true
+
+    # use all available cpu cores
+    host = RbConfig::CONFIG['host_os']
+    if host =~ /darwin/
+      cpus = `sysctl -n hw.ncpu`.to_i
+    elsif host =~ /linux/
+      cpus = `nproc`.to_i
+    else
+      cpus = 1
+    end
+
+    pipeline.vm.provider :virtualbox do |vb|
+      vb.customize ['modifyvm', :id, '--cpus', cpus]
+      vb.customize ['modifyvm', :id, '--memory', PIPELINE_MEMORY]
+      vb.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', 600000]
+    end
+
+    pipeline.vm.provision 'ansible' do |ansible|
+      ansible.inventory_path = 'hosts'
+      ansible.playbook = '../../ansible/playbooks/dev_data_pipeline.yml'
+      ansible.host_key_checking = false
+    end
+  end
+end

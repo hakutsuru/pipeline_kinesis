@@ -1,0 +1,19 @@
+---
+
+- name: download leiningen standalone jar file
+  sudo: true
+  get_url: url=https://leiningen.s3.amazonaws.com/downloads/leiningen-{{ clojure_lein_version }}-standalone.jar
+    dest=/usr/share/java/leiningen-{{ clojure_lein_version }}-standalone.jar
+    owner=root group=root mode=0644
+
+# avoid adding clojure_lein_version global var via link
+- name: link leiningen-current-standalone.jar to the versioned jar
+  sudo: true
+  file: path=/usr/share/java/leiningen-current-standalone.jar
+    src=/usr/share/java/leiningen-{{ clojure_lein_version }}-standalone.jar state=link
+
+- name: download packaging version of the lein script
+  sudo: true
+  get_url: url=https://raw.github.com/technomancy/leiningen/{{ clojure_lein_version }}/bin/lein-pkg
+    dest=/usr/bin/lein
+    owner=root group=root mode=0755
