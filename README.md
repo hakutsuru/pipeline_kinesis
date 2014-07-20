@@ -47,16 +47,12 @@ steps in these instructions.
 Testing with Vagrant
 --------------------
 
-First, launch one test node:
+First, launch and provision the data-pipeline environment:
 
-    $ vagrant ssh
-    $ export AWS_ACCESS_KEY_ID=[...]
-    $ export AWS_SECRET_KEY=[...]
     $ cd pipeline_kinesis/vagrant/data-pipeline
     $ vagrant up
 
 Copy the kinesis_test directory to the data-pipeline directory.
-
 
 Consumer Testing
 ----------------
